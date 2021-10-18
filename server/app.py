@@ -36,15 +36,23 @@ app.after_request(metrics.after_request)
 #     multiprocess.MultiProcessCollector(registry)
 #     return Response(generate_latest(registry), mimetype=CONTENT_TYPE_LATEST)
 
-@app.route('/intra_run_data_notebook/')
+
+@app.route("/intra_run_data_notebook/")
 def intra_run_data_notebook():
     args = request.args
     task_id = args.get("task_id")
     metric_name = args.get("metric_name")
-    subprocess.check_call(f"papermill -p task_id {task_id} -p metric_name {metric_name} ./simple_ftdc.ipynb ./{metric_name}.ipynb", shell=True)
-    subprocess.check_call(f"jupyter nbconvert --to html --execute ./{metric_name}.ipynb --output ./templates/{metric_name}.html", shell=True)
+    subprocess.check_call(
+        f"papermill -p task_id {task_id} -p metric_name {metric_name} ./simple_ftdc.ipynb ./{metric_name}.ipynb",
+        shell=True,
+    )
+    subprocess.check_call(
+        f"jupyter nbconvert --to html --execute ./{metric_name}.ipynb --output ./templates/{metric_name}.html",
+        shell=True,
+    )
     return render_template(f"{metric_name}.html")
     return args
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0")
