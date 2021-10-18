@@ -13,8 +13,8 @@ env:
   GUNICORN_CMD_ARGS: --workers=2 --worker-class=gevent --bind=0.0.0.0:5000 --chdir /app/server --timeout=3600 --access-logfile=- --log-level=DEBUG --config gunicorn_conf.py
   prometheus_multiproc_dir: /tmp/prometheus_multiproc
 
-envSecrets:
-  APP_SECRET: jupyter-notebook-service-secrets
+#envSecrets:
+#  APP_SECRET: jupyter-notebook-service-secrets
 
 resources:
   limits:
