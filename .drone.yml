@@ -13,24 +13,24 @@ steps:
 #  commands:
 #  - pip install tox
 #  - tox
-
-- name: slack-staging-start
-  pull: if-not-exists
-  image: plugins/slack
-  settings:
-    channel: techops-deployments
-    template: "*Staging*: building (<{{build.link}}|${DRONE_REPO}#{{truncate build.commit 8}}>) by {{build.author}} from `{{build.branch}}`\n"
-  environment:
-    SLACK_WEBHOOK:
-      from_secret: slack_webhook
-  when:
-    branch:
-    - main
-    event:
-    - push
-    status:
-    - success
-    - failure
+#
+#- name: slack-staging-start
+#  pull: if-not-exists
+#  image: plugins/slack
+#  settings:
+#    channel: techops-deployments
+#    template: "*Staging*: building (<{{build.link}}|${DRONE_REPO}#{{truncate build.commit 8}}>) by {{build.author}} from `{{build.branch}}`\n"
+#  environment:
+#    SLACK_WEBHOOK:
+#      from_secret: slack_webhook
+#  when:
+#    branch:
+#    - main
+#    event:
+#    - push
+#    status:
+#    - success
+#    - failure
 
 - name: slack-prod-start
   pull: if-not-exists
@@ -136,38 +136,38 @@ steps:
     event:
     - tag
 
-- name: slack-staging-finish
-  pull: if-not-exists
-  image: plugins/slack
-  settings:
-    channel: techops-deployments
-    template: "{{#success build.status}}\n  ✅ <{{build.link}}|${DRONE_REPO}#{{truncate build.commit 8}}> deployed in {{since build.started}}\n{{else}}\n  ❌ <{{build.link}}|${DRONE_REPO}#{{truncate build.commit 8}}> failed {{build.link}}\n{{/success}}\n"
-  environment:
-    SLACK_WEBHOOK:
-      from_secret: slack_webhook
-  when:
-    branch:
-    - main
-    event:
-    - push
-    status:
-    - success
-    - failure
-
-- name: slack-prod-finish
-  pull: if-not-exists
-  image: plugins/slack
-  settings:
-    channel: techops-deployments
-    template: "{{#success build.status}}\n  ✅ <{{build.link}}|${DRONE_REPO}#{{truncate build.commit 8}}> deployed in {{since build.started}}\n{{else}}\n  ❌ <{{build.link}}|${DRONE_REPO}#{{truncate build.commit 8}}> failed {{build.link}}\n{{/success}}\n"
-  environment:
-    SLACK_WEBHOOK:
-      from_secret: slack_webhook
-  when:
-    event:
-    - tag
-    status:
-    - success
-    - failure
+#- name: slack-staging-finish
+#  pull: if-not-exists
+#  image: plugins/slack
+#  settings:
+#    channel: techops-deployments
+#    template: "{{#success build.status}}\n  ✅ <{{build.link}}|${DRONE_REPO}#{{truncate build.commit 8}}> deployed in {{since build.started}}\n{{else}}\n  ❌ <{{build.link}}|${DRONE_REPO}#{{truncate build.commit 8}}> failed {{build.link}}\n{{/success}}\n"
+#  environment:
+#    SLACK_WEBHOOK:
+#      from_secret: slack_webhook
+#  when:
+#    branch:
+#    - main
+#    event:
+#    - push
+#    status:
+#    - success
+#    - failure
+#
+#- name: slack-prod-finish
+#  pull: if-not-exists
+#  image: plugins/slack
+#  settings:
+#    channel: techops-deployments
+#    template: "{{#success build.status}}\n  ✅ <{{build.link}}|${DRONE_REPO}#{{truncate build.commit 8}}> deployed in {{since build.started}}\n{{else}}\n  ❌ <{{build.link}}|${DRONE_REPO}#{{truncate build.commit 8}}> failed {{build.link}}\n{{/success}}\n"
+#  environment:
+#    SLACK_WEBHOOK:
+#      from_secret: slack_webhook
+#  when:
+#    event:
+#    - tag
+#    status:
+#    - success
+#    - failure
 
 ...
