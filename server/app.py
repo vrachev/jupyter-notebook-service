@@ -22,12 +22,12 @@ app.after_request(metrics.after_request)
 #     return "Logged 'Some info'"
 #
 #
-# @app.route("/")
-# def index():
-#     text = "{}<br><br>Here's my secret: {}".format(
-#         os.getenv("APP_MESSAGE", "Hello, World!"), os.getenv("APP_SECRET", "not set")
-#     )
-#     return text
+@app.route("/")
+def index():
+    text = "{}<br><br>Here's my secret: {}".format(
+        os.getenv("APP_MESSAGE", "Hello, World!"), os.getenv("APP_SECRET", "not set")
+    )
+    return text
 #
 #
 # @app.route("/metrics")
