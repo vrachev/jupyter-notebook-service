@@ -1,0 +1,24 @@
+# Kubernetes platform files
+Dockerfile*
+.dockerignore
+.drone.yml
+helm
+
+# Git files
+.git
+.gitignore
+
+# Local env files
+.python-version
+
+# Compiled files and distributions
+**/__pycache__
+*.pyc
+dist
+build
+**/*.egg-info
+
+# Local test files
+.tox
+.pytest_cache
+.coverage

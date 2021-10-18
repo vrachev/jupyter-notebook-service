@@ -1,0 +1,173 @@
+---
+kind: pipeline
+type: kubernetes
+name: default
+
+platform:
+  os: linux
+
+steps:
+- name: test-py37
+  pull: if-not-exists
+  image: python:3.7.12-slim
+  commands:
+  - pip install tox
+  - tox
+
+- name: slack-staging-start
+  pull: if-not-exists
+  image: plugins/slack
+  settings:
+    channel: techops-deployments
+    template: "*Staging*: building (<{{build.link}}|${DRONE_REPO}#{{truncate build.commit 8}}>) by {{build.author}} from `{{build.branch}}`\n"
+  environment:
+    SLACK_WEBHOOK:
+      from_secret: slack_webhook
+  when:
+    branch:
+    - master
+    event:
+    - push
+    status:
+    - success
+    - failure
+
+- name: slack-prod-start
+  pull: if-not-exists
+  image: plugins/slack
+  settings:
+    channel: techops-deployments
+    template: "*Production*: building <{{build.link}}|${DRONE_REPO}#{{truncate build.commit 8}}> by {{build.author}} from {{build.branch}} branch\n"
+  environment:
+    SLACK_WEBHOOK:
+      from_secret: slack_webhook
+  when:
+    event:
+    - tag
+    status:
+    - success
+    - failure
+
+- name: build+publish-master-branch
+  pull: if-not-exists
+  image: plugins/ecr
+  settings:
+    create_repository: true
+    registry: 795250896452.dkr.ecr.us-east-1.amazonaws.com
+    repo: 795250896452.dkr.ecr.us-east-1.amazonaws.com/internal-tools/${DRONE_REPO_NAME}
+    tags:
+    - git-${DRONE_COMMIT_SHA:0:7}
+    - latest
+  environment:
+    ECR_ACCESS_KEY:
+      from_secret: ecr_access_key
+    ECR_SECRET_KEY:
+      from_secret: ecr_secret_key
+  when:
+    branch:
+    - master
+    event:
+    - push
+
+- name: build+publish-tag
+  pull: if-not-exists
+  image: plugins/ecr
+  settings:
+    create_repository: true
+    registry: 795250896452.dkr.ecr.us-east-1.amazonaws.com
+    repo: 795250896452.dkr.ecr.us-east-1.amazonaws.com/internal-tools/${DRONE_REPO_NAME}
+    tags:
+    - ${DRONE_TAG}
+    - git-${DRONE_COMMIT_SHA:0:7}
+  environment:
+    ECR_ACCESS_KEY:
+      from_secret: ecr_access_key
+    ECR_SECRET_KEY:
+      from_secret: ecr_secret_key
+  when:
+    event:
+    - tag
+
+- name: deploy-staging
+  pull: if-not-exists
+  image: quay.io/mongodb/drone-helm:v2
+  settings:
+    chart: mongodb/web-app
+    chart_version: 4.7.3
+    client_only: true
+    helm_repos: mongodb=https://10gen.github.io/helm-charts
+    namespace: internal-tools
+    prefix: staging
+    release: jupyter-notebook-service
+    tiller_ns: internal-tools
+    values: image.tag=git-${DRONE_COMMIT_SHA:0:7},image.repository=795250896452.dkr.ecr.us-east-1.amazonaws.com/internal-tools/${DRONE_REPO_NAME}
+    values_files:
+    - ./environments/staging.yml
+  environment:
+    API_SERVER: https://api.staging.corp.mongodb.com
+    STAGING_KUBERNETES_TOKEN:
+      from_secret: staging_kubernetes_token
+  when:
+    branch:
+    - master
+    event:
+    - push
+
+- name: deploy-prod
+  pull: if-not-exists
+  image: quay.io/mongodb/drone-helm:v2
+  settings:
+    chart: mongodb/web-app
+    chart_version: 4.7.3
+    client_only: true
+    helm_repos: mongodb=https://10gen.github.io/helm-charts
+    namespace: internal-tools
+    prefix: prod
+    release: jupyter-notebook-service
+    tiller_ns: internal-tools
+    values: image.tag=${DRONE_TAG},image.repository=795250896452.dkr.ecr.us-east-1.amazonaws.com/internal-tools/${DRONE_REPO_NAME}
+    values_files:
+    - ./environments/prod.yml
+  environment:
+    API_SERVER: https://api.prod.corp.mongodb.com
+    PROD_KUBERNETES_TOKEN:
+      from_secret: prod_kubernetes_token
+  when:
+    event:
+    - tag
+
+- name: slack-staging-finish
+  pull: if-not-exists
+  image: plugins/slack
+  settings:
+    channel: techops-deployments
+    template: "{{#success build.status}}\n  ✅ <{{build.link}}|${DRONE_REPO}#{{truncate build.commit 8}}> deployed in {{since build.started}}\n{{else}}\n  ❌ <{{build.link}}|${DRONE_REPO}#{{truncate build.commit 8}}> failed {{build.link}}\n{{/success}}\n"
+  environment:
+    SLACK_WEBHOOK:
+      from_secret: slack_webhook
+  when:
+    branch:
+    - master
+    event:
+    - push
+    status:
+    - success
+    - failure
+
+- name: slack-prod-finish
+  pull: if-not-exists
+  image: plugins/slack
+  settings:
+    channel: techops-deployments
+    template: "{{#success build.status}}\n  ✅ <{{build.link}}|${DRONE_REPO}#{{truncate build.commit 8}}> deployed in {{since build.started}}\n{{else}}\n  ❌ <{{build.link}}|${DRONE_REPO}#{{truncate build.commit 8}}> failed {{build.link}}\n{{/success}}\n"
+  environment:
+    SLACK_WEBHOOK:
+      from_secret: slack_webhook
+  when:
+    event:
+    - tag
+    status:
+    - success
+    - failure
+
+...

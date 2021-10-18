@@ -1,0 +1,26 @@
+# local virtualenv
+venv/*
+
+# IDE files
+.idea/*
+
+# Don't save the credentials file
+config/private.yml
+
+# ignore compiled python files
+*.pyc
+ 
+# pytest
+.coverage
+.pytest_cache
+
+# python3 cache
+__pycache__
+
+# setup.py
+build
+dist
+*.egg-info/
+
+# tox
+.tox
