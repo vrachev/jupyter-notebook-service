@@ -6,7 +6,7 @@ service:
 ingress:
   enabled: true
   hosts:
-    - jupyter-notebook-service.internal-tools.prod.corp.mongodb.com
+    - jupyter-notebook-service.server-tig.prod.corp.mongodb.com
 
 env:
   APP_MESSAGE: Hello from your Flask app!

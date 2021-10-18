@@ -1,8 +1,8 @@
 # Flask App Example + Template
 
 hello-flask is an example app viewable at:
-- https://hello-flask.internal-tools.staging.corp.mongodb.com
-- https://hello-flask.internal-tools.prod.corp.mongodb.com
+- https://hello-flask.server-tig.staging.corp.mongodb.com
+- https://hello-flask.server-tig.prod.corp.mongodb.com
 
 and can be used as a template for other Flask apps.
 

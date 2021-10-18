@@ -54,7 +54,7 @@ steps:
   settings:
     create_repository: true
     registry: 795250896452.dkr.ecr.us-east-1.amazonaws.com
-    repo: 795250896452.dkr.ecr.us-east-1.amazonaws.com/internal-tools/${DRONE_REPO_NAME}
+    repo: 795250896452.dkr.ecr.us-east-1.amazonaws.com/server-tig/${DRONE_REPO_NAME}
     tags:
     - git-${DRONE_COMMIT_SHA:0:7}
     - latest
@@ -75,7 +75,7 @@ steps:
   settings:
     create_repository: true
     registry: 795250896452.dkr.ecr.us-east-1.amazonaws.com
-    repo: 795250896452.dkr.ecr.us-east-1.amazonaws.com/internal-tools/${DRONE_REPO_NAME}
+    repo: 795250896452.dkr.ecr.us-east-1.amazonaws.com/server-tig/${DRONE_REPO_NAME}
     tags:
     - ${DRONE_TAG}
     - git-${DRONE_COMMIT_SHA:0:7}
@@ -96,11 +96,11 @@ steps:
     chart_version: 4.7.3
     client_only: true
     helm_repos: mongodb=https://10gen.github.io/helm-charts
-    namespace: internal-tools
+    namespace: server-tig
     prefix: staging
     release: jupyter-notebook-service
-    tiller_ns: internal-tools
-    values: image.tag=git-${DRONE_COMMIT_SHA:0:7},image.repository=795250896452.dkr.ecr.us-east-1.amazonaws.com/internal-tools/${DRONE_REPO_NAME}
+    tiller_ns: server-tig
+    values: image.tag=git-${DRONE_COMMIT_SHA:0:7},image.repository=795250896452.dkr.ecr.us-east-1.amazonaws.com/server-tig/${DRONE_REPO_NAME}
     values_files:
     - ./environments/staging.yml
   environment:
@@ -121,11 +121,11 @@ steps:
     chart_version: 4.7.3
     client_only: true
     helm_repos: mongodb=https://10gen.github.io/helm-charts
-    namespace: internal-tools
+    namespace: server-tig
     prefix: prod
     release: jupyter-notebook-service
-    tiller_ns: internal-tools
-    values: image.tag=${DRONE_TAG},image.repository=795250896452.dkr.ecr.us-east-1.amazonaws.com/internal-tools/${DRONE_REPO_NAME}
+    tiller_ns: server-tig
+    values: image.tag=${DRONE_TAG},image.repository=795250896452.dkr.ecr.us-east-1.amazonaws.com/server-tig/${DRONE_REPO_NAME}
     values_files:
     - ./environments/prod.yml
   environment:
