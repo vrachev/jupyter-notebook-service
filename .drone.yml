@@ -25,7 +25,7 @@ steps:
       from_secret: slack_webhook
   when:
     branch:
-    - master
+    - main
     event:
     - push
     status:
@@ -65,7 +65,7 @@ steps:
       from_secret: ecr_secret_key
   when:
     branch:
-    - master
+    - main
     event:
     - push
 
@@ -109,7 +109,7 @@ steps:
       from_secret: staging_kubernetes_token
   when:
     branch:
-    - master
+    - main
     event:
     - push
 
@@ -147,7 +147,7 @@ steps:
       from_secret: slack_webhook
   when:
     branch:
-    - master
+    - main
     event:
     - push
     status:
