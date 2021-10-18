@@ -7,12 +7,12 @@ platform:
   os: linux
 
 steps:
-- name: test-py37
-  pull: if-not-exists
-  image: python:3.7.12-slim
-  commands:
-  - pip install tox
-  - tox
+#- name: test-py37
+#  pull: if-not-exists
+#  image: python:3.7.12-slim
+#  commands:
+#  - pip install tox
+#  - tox
 
 - name: slack-staging-start
   pull: if-not-exists
