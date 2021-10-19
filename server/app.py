@@ -47,7 +47,7 @@ def intra_run_data_notebook():
     gened_nb = os.path.join(app_root, f"{metric_name}.ipynb")
     gened_html = os.path.join(app_root, f"templates/{metric_name}.html")
     subprocess.check_call(
-        f"papermill -p task_id {task_id} -p metric_name {metric_name} {simple_nb} {gened_nb}",
+        f"papermill --log-level DEBUG -p task_id {task_id} -p metric_name {metric_name} {simple_nb} {gened_nb}",
         shell=True,
     )
     subprocess.check_call(
