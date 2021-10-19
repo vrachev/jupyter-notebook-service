@@ -47,7 +47,7 @@ def intra_run_data_notebook():
         shell=True,
     )
     subprocess.check_call(
-        f"jupyter nbconvert --to html --execute ./{metric_name}.ipynb --output ./templates/{metric_name}.html",
+        f"jupyter nbconvert --to html --execute ./{metric_name}.ipynb --output ./server/templates/{metric_name}.html",
         shell=True,
     )
     return render_template(f"{metric_name}.html")
@@ -55,4 +55,4 @@ def intra_run_data_notebook():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0")
+    app.run(debug=True, host="0.0.0.0")
