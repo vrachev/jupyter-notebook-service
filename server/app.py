@@ -12,8 +12,8 @@ logging.basicConfig(level="DEBUG", format=_format)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-app.before_request(metrics.before_request)
-app.after_request(metrics.after_request)
+# app.before_request(metrics.before_request)
+# app.after_request(metrics.after_request)
 
 
 # @app.route("/log-some-info")
@@ -42,12 +42,17 @@ def intra_run_data_notebook():
     args = request.args
     task_id = args.get("task_id")
     metric_name = args.get("metric_name")
+    cwd = os.getcwd()
+    print(cwd)
+    simple_nb = os.path.join(cwd, "simple_ftdc.ipynb")
+    gened_nb = os.path.join(cwd, f"{metric_name}.ipynb")
+    gened_html = os.path.join(cwd, f"server/templates/{metric_name}.html")
     subprocess.check_call(
-        f"papermill -p task_id {task_id} -p metric_name {metric_name} ./simple_ftdc.ipynb ./{metric_name}.ipynb",
+        f"papermill -p task_id {task_id} -p metric_name {metric_name} {simple_nb} {gened_nb}",
         shell=True,
     )
     subprocess.check_call(
-        f"jupyter nbconvert --to html --execute ./{metric_name}.ipynb --output ./server/templates/{metric_name}.html",
+        f"jupyter nbconvert --to html --execute {gened_nb} --output {gened_html}",
         shell=True,
     )
     return render_template(f"{metric_name}.html")
