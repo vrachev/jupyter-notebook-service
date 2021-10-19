@@ -43,7 +43,7 @@ def intra_run_data_notebook():
     task_id = args.get("task_id")
     metric_name = args.get("metric_name")
     app_root = app.root_path
-    simple_nb = os.path.join(app_root, "simple_ftdc-Copy1.ipynb")
+    simple_nb = os.path.join(app_root, "simple_ftdc.ipynb")
     gened_nb = os.path.join(app_root, f"{metric_name}.ipynb")
     gened_html = os.path.join(app_root, f"templates/{metric_name}.html")
     subprocess.check_call(
