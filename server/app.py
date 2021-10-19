@@ -42,11 +42,10 @@ def intra_run_data_notebook():
     args = request.args
     task_id = args.get("task_id")
     metric_name = args.get("metric_name")
-    cwd = os.getcwd()
-    print(cwd)
-    simple_nb = os.path.join(cwd, "simple_ftdc.ipynb")
-    gened_nb = os.path.join(cwd, f"{metric_name}.ipynb")
-    gened_html = os.path.join(cwd, f"server/templates/{metric_name}.html")
+    app_root = app.root_path
+    simple_nb = os.path.join(app_root, "simple_ftdc.ipynb")
+    gened_nb = os.path.join(app_root, f"{metric_name}.ipynb")
+    gened_html = os.path.join(app_root, f"server/templates/{metric_name}.html")
     subprocess.check_call(
         f"papermill -p task_id {task_id} -p metric_name {metric_name} {simple_nb} {gened_nb}",
         shell=True,
