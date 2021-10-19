@@ -18,11 +18,11 @@ env:
 
 resources:
   limits:
-    cpu: 400m
+    cpu: 1000m
     memory: 1Gi
   requests:
     cpu: 100m
-    memory: 128Mi
+    memory: 192Mi
 
 metrics:
   enabled: true
