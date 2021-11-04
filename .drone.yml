@@ -1,14 +1,14 @@
 ---
 kind: pipeline
 type: kubernetes
-name: main
+name: jupyter-hub
 
 platform:
   os: linux
 
 trigger:
   branch:
-  - jupyter-hub
+  - main
 
 steps:
 - name: publish
