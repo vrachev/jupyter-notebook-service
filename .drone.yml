@@ -1,7 +1,7 @@
 ---
 kind: pipeline
 type: kubernetes
-name: jupyter-hub
+name: default
 
 platform:
   os: linux
@@ -53,7 +53,7 @@ steps:
     event:
     - push
 
-
+...
 
 
 
