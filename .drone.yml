@@ -1,12 +1,57 @@
 ---
 kind: pipeline
 type: kubernetes
-name: default
+name: main
 
 platform:
   os: linux
 
+trigger:
+  branch:
+  - jupyter-hub
+
 steps:
+- name: publish
+  image: plugins/ecr
+  settings:
+    create_repository: true
+    registry: 795250896452.dkr.ecr.us-east-1.amazonaws.com
+    repo: server-tig/${DRONE_REPO_NAME}
+    tags:
+    - git-${DRONE_COMMIT_SHA:0:7}
+    - latest
+    access_key:
+      from_secret: ecr_access_key
+    secret_key:
+      from_secret: ecr_secret_key
+  when:
+    event:
+    - push
+
+- name: deploy-staging
+  image: quay.io/mongodb/drone-helm:v3
+  settings:
+    chart: jupyterhub/jupyterhub
+    chart_version: 1.2.0
+    add_repos: [jupyterhub=https://jupyterhub.github.io/helm-chart/]
+    namespace: server-tig
+    release: jupyter-notebook-service
+    values: image.tag=git-${DRONE_COMMIT_SHA:0:7},image.repository=795250896452.dkr.ecr.us-east-1.amazonaws.com/server-tig/${DRONE_REPO_NAME},ingress.enabled=true,ingress.hosts[0]=<APP>.server-tig.staging.corp.mongodb.com
+    api_server: https://api.staging.corp.mongodb.com
+    kubernetes_token:
+      from_secret: staging_kubernetes_token
+  when:
+    event:
+    - push
+
+
+
+
+
+
+
+
+#steps:
 #- name: test-py37
 #  pull: if-not-exists
 #  image: python:3.7.12-slim
@@ -31,110 +76,110 @@ steps:
 #    status:
 #    - success
 #    - failure
-
-- name: slack-prod-start
-  pull: if-not-exists
-  image: plugins/slack
-  settings:
-    channel: techops-deployments
-    template: "*Production*: building <{{build.link}}|${DRONE_REPO}#{{truncate build.commit 8}}> by {{build.author}} from {{build.branch}} branch\n"
-  environment:
-    SLACK_WEBHOOK:
-      from_secret: slack_webhook
-  when:
-    event:
-    - tag
-    status:
-    - success
-    - failure
-
-- name: build+publish-master-branch
-  pull: if-not-exists
-  image: plugins/ecr
-  settings:
-    create_repository: true
-    registry: 795250896452.dkr.ecr.us-east-1.amazonaws.com
-    repo: 795250896452.dkr.ecr.us-east-1.amazonaws.com/server-tig/${DRONE_REPO_NAME}
-    tags:
-    - git-${DRONE_COMMIT_SHA:0:7}
-    - latest
-  environment:
-    ECR_ACCESS_KEY:
-      from_secret: ecr_access_key
-    ECR_SECRET_KEY:
-      from_secret: ecr_secret_key
-  when:
-    branch:
-    - main
-    event:
-    - push
-
-- name: build+publish-tag
-  pull: if-not-exists
-  image: plugins/ecr
-  settings:
-    create_repository: true
-    registry: 795250896452.dkr.ecr.us-east-1.amazonaws.com
-    repo: 795250896452.dkr.ecr.us-east-1.amazonaws.com/server-tig/${DRONE_REPO_NAME}
-    tags:
-    - ${DRONE_TAG}
-    - git-${DRONE_COMMIT_SHA:0:7}
-  environment:
-    ECR_ACCESS_KEY:
-      from_secret: ecr_access_key
-    ECR_SECRET_KEY:
-      from_secret: ecr_secret_key
-  when:
-    event:
-    - tag
-
-- name: deploy-staging
-  pull: if-not-exists
-  image: quay.io/mongodb/drone-helm:v2
-  settings:
-    chart: mongodb/web-app
-    chart_version: 4.7.3
-    client_only: true
-    helm_repos: mongodb=https://10gen.github.io/helm-charts
-    namespace: server-tig
-    prefix: staging
-    release: jupyter-notebook-service
-    tiller_ns: server-tig
-    values: image.tag=git-${DRONE_COMMIT_SHA:0:7},image.repository=795250896452.dkr.ecr.us-east-1.amazonaws.com/server-tig/${DRONE_REPO_NAME}
-    values_files:
-    - ./environments/staging.yml
-  environment:
-    API_SERVER: https://api.staging.corp.mongodb.com
-    STAGING_KUBERNETES_TOKEN:
-      from_secret: staging_kubernetes_token
-  when:
-    branch:
-    - main
-    event:
-    - push
-
-- name: deploy-prod
-  pull: if-not-exists
-  image: quay.io/mongodb/drone-helm:v2
-  settings:
-    chart: mongodb/web-app
-    chart_version: 4.7.3
-    client_only: true
-    helm_repos: mongodb=https://10gen.github.io/helm-charts
-    namespace: server-tig
-    prefix: prod
-    release: jupyter-notebook-service
-    tiller_ns: server-tig
-    values: image.tag=${DRONE_TAG},image.repository=795250896452.dkr.ecr.us-east-1.amazonaws.com/server-tig/${DRONE_REPO_NAME}
-    values_files:
-    - ./environments/prod.yml
-  environment:
-    API_SERVER: https://api.prod.corp.mongodb.com
-    PROD_KUBERNETES_TOKEN:
-      from_secret: prod_kubernetes_token
-  when:
-    event:
-    - tag
+#
+#- name: slack-prod-start
+#  pull: if-not-exists
+#  image: plugins/slack
+#  settings:
+#    channel: techops-deployments
+#    template: "*Production*: building <{{build.link}}|${DRONE_REPO}#{{truncate build.commit 8}}> by {{build.author}} from {{build.branch}} branch\n"
+#  environment:
+#    SLACK_WEBHOOK:
+#      from_secret: slack_webhook
+#  when:
+#    event:
+#    - tag
+#    status:
+#    - success
+#    - failure
+#
+#- name: build+publish-master-branch
+#  pull: if-not-exists
+#  image: plugins/ecr
+#  settings:
+#    create_repository: true
+#    registry: 795250896452.dkr.ecr.us-east-1.amazonaws.com
+#    repo: 795250896452.dkr.ecr.us-east-1.amazonaws.com/server-tig/${DRONE_REPO_NAME}
+#    tags:
+#    - git-${DRONE_COMMIT_SHA:0:7}
+#    - latest
+#  environment:
+#    ECR_ACCESS_KEY:
+#      from_secret: ecr_access_key
+#    ECR_SECRET_KEY:
+#      from_secret: ecr_secret_key
+#  when:
+#    branch:
+#    - main
+#    event:
+#    - push
+#
+#- name: build+publish-tag
+#  pull: if-not-exists
+#  image: plugins/ecr
+#  settings:
+#    create_repository: true
+#    registry: 795250896452.dkr.ecr.us-east-1.amazonaws.com
+#    repo: 795250896452.dkr.ecr.us-east-1.amazonaws.com/server-tig/${DRONE_REPO_NAME}
+#    tags:
+#    - ${DRONE_TAG}
+#    - git-${DRONE_COMMIT_SHA:0:7}
+#  environment:
+#    ECR_ACCESS_KEY:
+#      from_secret: ecr_access_key
+#    ECR_SECRET_KEY:
+#      from_secret: ecr_secret_key
+#  when:
+#    event:
+#    - tag
+#
+#- name: deploy-staging
+#  pull: if-not-exists
+#  image: quay.io/mongodb/drone-helm:v2
+#  settings:
+#    chart: mongodb/web-app
+#    chart_version: 4.7.3
+#    client_only: true
+#    helm_repos: mongodb=https://10gen.github.io/helm-charts
+#    namespace: server-tig
+#    prefix: staging
+#    release: jupyter-notebook-service
+#    tiller_ns: server-tig
+#    values: image.tag=git-${DRONE_COMMIT_SHA:0:7},image.repository=795250896452.dkr.ecr.us-east-1.amazonaws.com/server-tig/${DRONE_REPO_NAME}
+#    values_files:
+#    - ./environments/staging.yml
+#  environment:
+#    API_SERVER: https://api.staging.corp.mongodb.com
+#    STAGING_KUBERNETES_TOKEN:
+#      from_secret: staging_kubernetes_token
+#  when:
+#    branch:
+#    - main
+#    event:
+#    - push
+#
+#- name: deploy-prod
+#  pull: if-not-exists
+#  image: quay.io/mongodb/drone-helm:v2
+#  settings:
+#    chart: mongodb/web-app
+#    chart_version: 4.7.3
+#    client_only: true
+#    helm_repos: mongodb=https://10gen.github.io/helm-charts
+#    namespace: server-tig
+#    prefix: prod
+#    release: jupyter-notebook-service
+#    tiller_ns: server-tig
+#    values: image.tag=${DRONE_TAG},image.repository=795250896452.dkr.ecr.us-east-1.amazonaws.com/server-tig/${DRONE_REPO_NAME}
+#    values_files:
+#    - ./environments/prod.yml
+#  environment:
+#    API_SERVER: https://api.prod.corp.mongodb.com
+#    PROD_KUBERNETES_TOKEN:
+#      from_secret: prod_kubernetes_token
+#  when:
+#    event:
+#    - tag
 
 #- name: slack-staging-finish
 #  pull: if-not-exists
@@ -169,5 +214,3 @@ steps:
 #    status:
 #    - success
 #    - failure
-
-...
