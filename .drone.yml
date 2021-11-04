@@ -1,4 +1,3 @@
----
 kind: pipeline
 type: kubernetes
 name: default
@@ -12,18 +11,18 @@ trigger:
 
 steps:
 - name: publish
-  image: plugins/ecr
+  image: plugins/kaniko-ecr
   settings:
     create_repository: true
     registry: 795250896452.dkr.ecr.us-east-1.amazonaws.com
-    repo: server-tig/${DRONE_REPO_NAME}
+    repo: <NAMESPACE>/${DRONE_REPO_NAME}
     tags:
     - git-${DRONE_COMMIT_SHA:0:7}
     - latest
-  access_key:
-    from_secret: ecr_access_key
-  secret_key:
-    from_secret: ecr_secret_key
+    access_key:
+      from_secret: ecr_access_key
+    secret_key:
+      from_secret: ecr_secret_key
   when:
     branch:
     - main
@@ -42,16 +41,15 @@ steps:
     values: image.tag=git-${DRONE_COMMIT_SHA:0:7},image.repository=795250896452.dkr.ecr.us-east-1.amazonaws.com/server-tig/${DRONE_REPO_NAME}
     values_files:
     - ./environments/staging.yml
-  api_server: https://api.staging.corp.mongodb.com
-  kubernetes_token:
-    from_secret: staging_kubernetes_token
+    api_server: https://api.staging.corp.mongodb.com
+    kubernetes_token:
+      from_secret: staging_kubernetes_token
   when:
     branch:
     - main
     event:
     - push
 
-...
 
 
 
