@@ -20,11 +20,10 @@ steps:
     tags:
     - git-${DRONE_COMMIT_SHA:0:7}
     - latest
-  environment:
-    ECR_ACCESS_KEY:
-      from_secret: ecr_access_key
-    ECR_SECRET_KEY:
-      from_secret: ecr_secret_key
+  access_key:
+    from_secret: ecr_access_key
+  secret_key:
+    from_secret: ecr_secret_key
   when:
     branch:
     - main
@@ -43,10 +42,9 @@ steps:
     values: image.tag=git-${DRONE_COMMIT_SHA:0:7},image.repository=795250896452.dkr.ecr.us-east-1.amazonaws.com/server-tig/${DRONE_REPO_NAME}
     values_files:
     - ./environments/staging.yml
-  environment:
-    API_SERVER: https://api.staging.corp.mongodb.com
-    STAGING_KUBERNETES_TOKEN:
-      from_secret: staging_kubernetes_token
+  api_server: https://api.staging.corp.mongodb.com
+  kubernetes_token:
+    from_secret: staging_kubernetes_token
   when:
     branch:
     - main
