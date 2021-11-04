@@ -33,13 +33,22 @@ steps:
   settings:
     chart: jupyterhub/jupyterhub
     chart_version: 1.2.0
+    client_only: true
     add_repos: [jupyterhub=https://jupyterhub.github.io/helm-chart/]
     namespace: server-tig
     release: jupyter-notebook-service
-    values: image.tag=git-${DRONE_COMMIT_SHA:0:7},image.repository=795250896452.dkr.ecr.us-east-1.amazonaws.com/server-tig/${DRONE_REPO_NAME},ingress.enabled=true,ingress.hosts[0]=<APP>.server-tig.staging.corp.mongodb.com
+    prefix: staging
+    values: image.tag=git-${DRONE_COMMIT_SHA:0:7},image.repository=795250896452.dkr.ecr.us-east-1.amazonaws.com/server-tig/${DRONE_REPO_NAME}
     api_server: https://api.staging.corp.mongodb.com
+    tiller_ns: server-tig
+    values_files:
+      - ./environments/staging.yml
     kubernetes_token:
       from_secret: staging_kubernetes_token
+    environment:
+      API_SERVER: https://api.staging.corp.mongodb.com
+      STAGING_KUBERNETES_TOKEN:
+        from_secret: staging_kubernetes_token
   when:
     event:
     - push

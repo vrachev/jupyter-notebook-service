@@ -8,24 +8,24 @@ ingress:
   hosts:
     - jupyter-notebook-service.server-tig.staging.corp.mongodb.com
 
-env:
-  APP_MESSAGE: Hello from your Flask app!
-  GUNICORN_CMD_ARGS: --workers=2 --worker-class=gevent --bind=0.0.0.0:5000 --chdir /app/server --timeout=3600 --access-logfile=- --log-level=DEBUG --config gunicorn_conf.py
-  prometheus_multiproc_dir: /tmp/prometheus_multiproc
+#env:
+#  APP_MESSAGE: Hello from your Flask app!
+#  GUNICORN_CMD_ARGS: --workers=2 --worker-class=gevent --bind=0.0.0.0:5000 --chdir /app/server --timeout=3600 --access-logfile=- --log-level=DEBUG --config gunicorn_conf.py
+#  prometheus_multiproc_dir: /tmp/prometheus_multiproc
 
 #envSecrets:
 #  APP_SECRET: jupyter-notebook-service-secrets
 
 resources:
   limits:
-    cpu: 3000m
-    memory: 12Gi
+    cpu: 300m
+    memory: 1Gi
   requests:
     cpu: 100m
     memory: 192Mi
 
-metrics:
-  enabled: true
+#metrics:
+#  enabled: true
 
 #prometheusRules:
 #  # Alert for any instance that has a median request latency >8s.
