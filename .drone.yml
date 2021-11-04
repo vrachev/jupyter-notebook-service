@@ -36,7 +36,6 @@ steps:
   settings:
     chart: jupyterhub/jupyterhub
     chart_version: 1.2.0
-    client_only: true
     add_repos: [jupyterhub=https://jupyterhub.github.io/helm-chart/]
     namespace: server-tig
     release: jupyter-notebook-service
