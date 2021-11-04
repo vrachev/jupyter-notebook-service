@@ -145,30 +145,30 @@ steps:
 #    event:
 #    - tag
 #
-- name: deploy-staging
-  pull: if-not-exists
-  image: quay.io/mongodb/drone-helm:v2
-  settings:
-    chart: mongodb/web-app
-    chart_version: 4.7.3
-    client_only: true
-    helm_repos: mongodb=https://10gen.github.io/helm-charts
-    namespace: server-tig
-    prefix: staging
-    release: jupyter-notebook-service
-    tiller_ns: server-tig
-    values: image.tag=git-${DRONE_COMMIT_SHA:0:7},image.repository=795250896452.dkr.ecr.us-east-1.amazonaws.com/server-tig/${DRONE_REPO_NAME}
-    values_files:
-    - ./environments/staging.yml
-  environment:
-    API_SERVER: https://api.staging.corp.mongodb.com
-    STAGING_KUBERNETES_TOKEN:
-      from_secret: staging_kubernetes_token
-  when:
-    branch:
-    - main
-    event:
-    - push
+#- name: deploy-staging
+#  pull: if-not-exists
+#  image: quay.io/mongodb/drone-helm:v2
+#  settings:
+#    chart: mongodb/web-app
+#    chart_version: 4.7.3
+#    client_only: true
+#    helm_repos: mongodb=https://10gen.github.io/helm-charts
+#    namespace: server-tig
+#    prefix: staging
+#    release: jupyter-notebook-service
+#    tiller_ns: server-tig
+#    values: image.tag=git-${DRONE_COMMIT_SHA:0:7},image.repository=795250896452.dkr.ecr.us-east-1.amazonaws.com/server-tig/${DRONE_REPO_NAME}
+#    values_files:
+#    - ./environments/staging.yml
+#  environment:
+#    API_SERVER: https://api.staging.corp.mongodb.com
+#    STAGING_KUBERNETES_TOKEN:
+#      from_secret: staging_kubernetes_token
+#  when:
+#    branch:
+#    - main
+#    event:
+#    - push
 #
 #- name: deploy-prod
 #  pull: if-not-exists
